@@ -19,6 +19,7 @@ $posts->execute(array($_REQUEST['id']));
 	<title>ひとこと掲示板</title>
 
 	<link rel="stylesheet" href="style.css" />
+  <script src="https://kit.fontawesome.com/87bb931ed4.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -33,6 +34,8 @@ $posts->execute(array($_REQUEST['id']));
     <div class="msg">
     <img src="member_picture/<?php print(htmlspecialchars($post['picture'], ENT_QUOTES)); ?>" width="48" height="48" alt="<?php print(htmlspecialchars($post['name'], ENT_QUOTES)); ?>" />
     <p><?php print(htmlspecialchars($post['message'])); ?><span class="name">（<?php print(htmlspecialchars($post['name'])); ?> ）</span></p>
+    <!-- いいねボタン -->
+    <i class="far fa-heart"></i>
     <p class="day"><?php print(htmlspecialchars($post['created'])); ?></p>
     </div>
   <?php else: ?>

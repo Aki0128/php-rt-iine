@@ -53,6 +53,9 @@ if (isset($_REQUEST['res'])) {
     $message = '@' . $table['name'] . ' ' . $table['message'];
 }
 
+// いいねの処理
+// if (isset($_REQUEST[]))
+
 // htmlspecialcharsのショートカット
 function h($value)
 {
@@ -74,6 +77,7 @@ function makeLink($value)
 	<title>ひとこと掲示板</title>
 
 	<link rel="stylesheet" href="style.css" />
+  <script src="https://kit.fontawesome.com/87bb931ed4.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -102,6 +106,8 @@ function makeLink($value)
     <div class="msg">
     <img src="member_picture/<?php print(h($post['picture'], ENT_QUOTES)); ?>" width="48" height="48" alt="<?php print(h($post['name'], ENT_QUOTES)); ?>" />
     <p><?php echo makeLink(h($post['message'], ENT_QUOTES)); ?><span class="name">（<?php print(h($post['name'], ENT_QUOTES)); ?>）</span>[<a href="index.php?res=<?php print(h($post['id'], ENT_QUOTES)); ?>">Re</a>]</p>
+    <!-- いいねボタン -->
+    <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="far fa-heart"></i></a>
     <p class="day"><a href="view.php?id=<?php print(h($post['id'])); ?>"><?php print(h($post['created'], ENT_QUOTES)); ?></a>
 
     <?php if ($post['reply_post_id'] > 0): ?>
