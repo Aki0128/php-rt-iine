@@ -53,9 +53,6 @@ if (isset($_REQUEST['res'])) {
     $message = '@' . $table['name'] . ' ' . $table['message'];
 }
 
-// いいねの処理
-// if (isset($_REQUEST[]))
-
 // htmlspecialcharsのショートカット
 function h($value)
 {
@@ -106,8 +103,21 @@ function makeLink($value)
     <div class="msg">
     <img src="member_picture/<?php print(h($post['picture'], ENT_QUOTES)); ?>" width="48" height="48" alt="<?php print(h($post['name'], ENT_QUOTES)); ?>" />
     <p><?php echo makeLink(h($post['message'], ENT_QUOTES)); ?><span class="name">（<?php print(h($post['name'], ENT_QUOTES)); ?>）</span>[<a href="index.php?res=<?php print(h($post['id'], ENT_QUOTES)); ?>">Re</a>]</p>
+    <!-- いいねの処理 -->
+    <?php
+    $likes = $db->prepare('SELECT COUNT(*) AS cnt FROM likes WHERE member_id=? AND like_post_id=?');
+    $likes->execute(array(
+      $_SESSION['id'],
+      $post['id']));
+    $like = $likes->fetch();
+    ?>
     <!-- いいねボタン -->
+    <?php if ($like['cnt'] == 0): ?>
     <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="far fa-heart"></i></a>
+    <?php else: ?>
+    <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="fas fa-heart"></i></a>
+    <?php endif; ?>
+
     <p class="day"><a href="view.php?id=<?php print(h($post['id'])); ?>"><?php print(h($post['created'], ENT_QUOTES)); ?></a>
 
     <?php if ($post['reply_post_id'] > 0): ?>
