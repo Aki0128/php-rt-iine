@@ -9,6 +9,7 @@ if (empty($_REQUEST['id'])) {
 
 $posts = $db->prepare('SELECT m.name, m.picture, p.* FROM members m, posts p WHERE m.id=p.member_id AND p.id=?');
 $posts->execute(array($_REQUEST['id']));
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -34,8 +35,22 @@ $posts->execute(array($_REQUEST['id']));
     <div class="msg">
     <img src="member_picture/<?php print(htmlspecialchars($post['picture'], ENT_QUOTES)); ?>" width="48" height="48" alt="<?php print(htmlspecialchars($post['name'], ENT_QUOTES)); ?>" />
     <p><?php print(htmlspecialchars($post['message'])); ?><span class="name">（<?php print(htmlspecialchars($post['name'])); ?> ）</span></p>
+    <!-- いいねの処理 -->
+    <?php
+    $likes = $db->prepare('SELECT COUNT(*) AS cnt FROM likes WHERE member_id=? AND like_post_id=?');
+    $likes->execute(array(
+      $_SESSION['id'],
+      $_REQUEST['id']));
+    $like = $likes->fetch();
+    ?>
     <!-- いいねボタン -->
-    <i class="far fa-heart"></i>
+    <?php if ($like['cnt'] == 0): ?>
+    <a href="like.php?id=<?php print(htmlspecialchars($post['id'], ENT_QUOTES)); ?>"><i class="far fa-heart"></i></a>
+    <?php else: ?>
+    <a href="like.php?id=<?php print(htmlspecialchars($post['id'], ENT_QUOTES)); ?>"><i class="fas fa-heart"></i></a>
+    <?php endif; ?>
+    <!-- リツイートボタン -->
+    <a href=""><i class="fas fa-retweet"></i></a>
     <p class="day"><?php print(htmlspecialchars($post['created'])); ?></p>
     </div>
   <?php else: ?>

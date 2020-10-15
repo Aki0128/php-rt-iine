@@ -117,6 +117,8 @@ function makeLink($value)
     <?php else: ?>
     <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="fas fa-heart"></i></a>
     <?php endif; ?>
+    <!-- リツイートボタン -->
+    <a href=""><i class="fas fa-retweet"></i></a>
 
     <p class="day"><a href="view.php?id=<?php print(h($post['id'])); ?>"><?php print(h($post['created'], ENT_QUOTES)); ?></a>
 
