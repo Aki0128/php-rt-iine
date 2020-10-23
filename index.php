@@ -33,14 +33,17 @@ if ($page == '') {
 }
 $page = max($page, 1);
 
-$counts = $db->query('SELECT COUNT(*) AS cnt FROM posts');
+$counts = $db->query('SELECT(SELECT COUNT(*) FROM posts)+(SELECT COUNT(*) FROM retweet) AS cnt');
 $cnt = $counts->fetch();
-$maxPage = ceil($cnt['cnt'] / 5);
+$maxPage = ceil($cnt['cnt'] / 10);
 $page = min($page, $maxPage);
 
-$start = ($page -1) * 5;
+$start = ($page -1) * 10;
 
-$posts = $db->prepare('SELECT m.name, m.picture, p.* FROM members m, posts p WHERE m.id=p.member_id ORDER BY p.created DESC LIMIT ?,5');
+$posts= $db->prepare('SELECT posts.*, members.name, members.picture, 0 AS rt_flag FROM posts, members WHERE posts.member_id=members.id 
+UNION ALL 
+SELECT posts.id, posts.message, posts.member_id, null AS reply_post_id, retweet.created, null AS modified, members.name, members.picture, 1 AS rt_flag FROM retweet, posts, members WHERE posts.id=retweet.retweet_post_id AND members.id=posts.member_id 
+ORDER BY created DESC LIMIT ?,10');
 $posts->bindParam(1, $start, PDO::PARAM_INT);
 $posts->execute();
 
@@ -101,6 +104,19 @@ function makeLink($value)
 
 <?php foreach ($posts as $post): ?>
     <div class="msg">
+    <!-- リツイートした人を表示する処理 -->
+    <?php
+    $retweet_name = $db->prepare('SELECT * FROM members, retweet WHERE members.id=retweet.member_id AND retweet_post_id=? AND retweet.created=?');
+    $retweet_name->execute(array(
+      $post['id'],
+      $post['created']));
+    $rt_name = $retweet_name->fetch();
+    ?>
+    
+    <?php if ($post['rt_flag'] == 1): ?>
+    <p><?php print($rt_name['name']) ?>さんがリツイート</p>
+    <?php endif; ?>
+  
     <img src="member_picture/<?php print(h($post['picture'], ENT_QUOTES)); ?>" width="48" height="48" alt="<?php print(h($post['name'], ENT_QUOTES)); ?>" />
     <p><?php echo makeLink(h($post['message'], ENT_QUOTES)); ?><span class="name">（<?php print(h($post['name'], ENT_QUOTES)); ?>）</span>[<a href="index.php?res=<?php print(h($post['id'], ENT_QUOTES)); ?>">Re</a>]</p>
     <!-- いいねの処理 -->
@@ -109,17 +125,40 @@ function makeLink($value)
     $likes->execute(array(
       $_SESSION['id'],
       $post['id']));
-    $like = $likes->fetch();
-    ?>
+      $like = $likes->fetch();
+      ?>
     <!-- いいねボタン -->
     <?php if ($like['cnt'] == 0): ?>
     <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="far fa-heart"></i></a>
     <?php else: ?>
     <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="fas fa-heart"></i></a>
     <?php endif; ?>
+      <!-- リツイートの処理 -->
+      <?php
+      $retweet = $db->prepare('SELECT COUNT(*) AS cnt FROM retweet WHERE member_id=? AND retweet_post_id=?');
+      $retweet->execute(array(
+        $_SESSION['id'],
+        $post['id']));
+      $rt = $retweet->fetch();
+      ?>
     <!-- リツイートボタン -->
-    <a href=""><i class="fas fa-retweet"></i></a>
-
+    <?php if ($rt['cnt'] == 0): ?>
+    <a href="retweet.php?id=<?php print(h($post['id'])); ?>"><i class="fas fa-retweet"></i></a>
+    <?php else: ?>
+    <a href="retweet.php?id=<?php print(h($post['id'])); ?>" style="color: #fc9ce7"><i class="fas fa-retweet"></i></a>
+    <?php endif; ?>
+    <!-- リツイート件数表示の処理 -->
+    <?php
+    $retweet_count = $db->prepare('SELECT COUNT(*) AS cnt FROM retweet WHERE retweet_post_id=?');
+    $retweet_count->execute(array(
+      $post['id']
+    ));
+    $rt_count = $retweet_count->fetch();
+    if ($rt_count['cnt'] > 0) {
+        echo $rt_count['cnt'];
+    }
+    ?>
+    
     <p class="day"><a href="view.php?id=<?php print(h($post['id'])); ?>"><?php print(h($post['created'], ENT_QUOTES)); ?></a>
 
     <?php if ($post['reply_post_id'] > 0): ?>

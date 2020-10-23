@@ -49,8 +49,32 @@ $posts->execute(array($_REQUEST['id']));
     <?php else: ?>
     <a href="like.php?id=<?php print(htmlspecialchars($post['id'], ENT_QUOTES)); ?>"><i class="fas fa-heart"></i></a>
     <?php endif; ?>
+    <!-- リツイートの処理 -->
+    <?php
+    $retweet = $db->prepare('SELECT COUNT(*) AS cnt FROM retweet WHERE member_id=? AND retweet_post_id=?');
+    $retweet->execute(array(
+      $_SESSION['id'],
+      $_REQUEST['id']));
+    $rt = $retweet->fetch();
+    ?>
     <!-- リツイートボタン -->
-    <a href=""><i class="fas fa-retweet"></i></a>
+    <?php if ($rt['cnt']== 0): ?>
+    <a href="retweet.php?id=<?php print(htmlspecialchars($post['id'])); ?>"><i class="fas fa-retweet"></i></a>
+    <?php else: ?>
+    <a href="retweet.php?id=<?php print(htmlspecialchars($post['id'])); ?>" style="color: #fc9ce7"><i class="fas fa-retweet"></i></a>
+    <?php endif; ?>
+    <!-- リツイート件数表示の処理 -->
+    <?php
+    $retweet_count = $db->prepare('SELECT COUNT(*) AS cnt FROM retweet WHERE retweet_post_id=?');
+    $retweet_count->execute(array(
+      $post['id']
+    ));
+    $rt_count = $retweet_count->fetch();
+    if ($rt_count['cnt'] > 0) {
+        echo $rt_count['cnt'];
+    }
+    ?>
+
     <p class="day"><?php print(htmlspecialchars($post['created'])); ?></p>
     </div>
   <?php else: ?>
