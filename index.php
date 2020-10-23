@@ -89,10 +89,10 @@ function makeLink($value)
   	<div style="text-align: right"><a href="logout.php">ログアウト</a></div>
     <form action="" method="post">
       <dl>
-        <dt><?php print(h($member['name'], ENT_QUOTES)); ?>さん、メッセージをどうぞ</dt>
+        <dt><?php print(h($member['name'])); ?>さん、メッセージをどうぞ</dt>
         <dd>
-          <textarea name="message" cols="50" rows="5"><?php print(h($message, ENT_QUOTES)); ?></textarea>
-          <input type="hidden" name="reply_post_id" value="<?php print(h($_REQUEST['res'], ENT_QUOTES)); ?>" />
+          <textarea name="message" cols="50" rows="5"><?php print(h($message)); ?></textarea>
+          <input type="hidden" name="reply_post_id" value="<?php print(h($_REQUEST['res'])); ?>" />
         </dd>
       </dl>
       <div>
@@ -117,8 +117,8 @@ function makeLink($value)
     <p><?php print($rt_name['name']) ?>さんがリツイート</p>
     <?php endif; ?>
   
-    <img src="member_picture/<?php print(h($post['picture'], ENT_QUOTES)); ?>" width="48" height="48" alt="<?php print(h($post['name'], ENT_QUOTES)); ?>" />
-    <p><?php echo makeLink(h($post['message'], ENT_QUOTES)); ?><span class="name">（<?php print(h($post['name'], ENT_QUOTES)); ?>）</span>[<a href="index.php?res=<?php print(h($post['id'], ENT_QUOTES)); ?>">Re</a>]</p>
+    <img src="member_picture/<?php print(h($post['picture'])); ?>" width="48" height="48" alt="<?php print(h($post['name'])); ?>" />
+    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php print(h($post['name'])); ?>）</span>[<a href="index.php?res=<?php print(h($post['id'])); ?>">Re</a>]</p>
     <!-- いいねの処理 -->
     <?php
     $likes = $db->prepare('SELECT COUNT(*) AS cnt FROM likes WHERE member_id=? AND like_post_id=?');
@@ -129,9 +129,9 @@ function makeLink($value)
       ?>
     <!-- いいねボタン -->
     <?php if ($like['cnt'] == 0): ?>
-    <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="far fa-heart"></i></a>
+    <a href="like.php?id=<?php print(h($post['id'])); ?>"><i class="far fa-heart"></i></a>
     <?php else: ?>
-    <a href="like.php?id=<?php print(h($post['id'], ENT_QUOTES)); ?>"><i class="fas fa-heart"></i></a>
+    <a href="like.php?id=<?php print(h($post['id'])); ?>"><i class="fas fa-heart"></i></a>
     <?php endif; ?>
       <!-- リツイートの処理 -->
       <?php
@@ -159,10 +159,10 @@ function makeLink($value)
     }
     ?>
     
-    <p class="day"><a href="view.php?id=<?php print(h($post['id'])); ?>"><?php print(h($post['created'], ENT_QUOTES)); ?></a>
+    <p class="day"><a href="view.php?id=<?php print(h($post['id'])); ?>"><?php print(h($post['created'])); ?></a>
 
     <?php if ($post['reply_post_id'] > 0): ?>
-<a href="view.php?id=<?php print(h($post['reply_post_id'], ENT_QUOTES)); ?>">
+<a href="view.php?id=<?php print(h($post['reply_post_id'])); ?>">
 返信元のメッセージ</a>
 <?php endif; ?>
 
